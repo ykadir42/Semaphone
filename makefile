@@ -1,4 +1,3 @@
-all: main.c
+all: main.c control.c
 	gcc -o "main" main.c
-run: all
-	./main
+	gcc -o "control" control.c
