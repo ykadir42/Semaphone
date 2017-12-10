@@ -13,11 +13,11 @@
 #define SEM_KEY 980081
 
 union semun {
-   int              val;    /* Value for SETVAL */
-   struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
-   unsigned short  *array;  /* Array for GETALL, SETALL */
-   struct seminfo  *__buf;  /* Buffer for IPC_INFO
-                               (Linux-specific) */
+  int              val;    /* Value for SETVAL */
+  struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+  unsigned short  *array;  /* Array for GETALL, SETALL */
+  struct seminfo  *__buf;  /* Buffer for IPC_INFO
+			      (Linux-specific) */
 };
 
 void printstory () {
@@ -27,45 +27,44 @@ void printstory () {
   char* buf = malloc(size + 1);
   read(fd, buf, size);
   printf("STORY \n%s\n", buf);
+  close(fd);
 }
 
 int main(int argc, char** argv){
-	if(argc != 2){
-		printf("error: unexpected number of arguments, expected 1\n");
-		return 0;
-	}
+  if(argc != 2){
+    printf("error: unexpected number of arguments, expected 1\n");
+    return 0;
+  }
 
-	if(!strcmp(argv[1], "-c")){
-		union semun su;
-		su.val = 1;
-		int shm = shmget(SHM_KEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
-		int sem = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
-		semctl(sem, 0, SETVAL, su);
-		int fd = open("story.txt", O_CREAT | O_RDWR | O_TRUNC | 0644);
-		close(fd);
-		return 0;
-	}
+  if(!strcmp(argv[1], "-c")){
+    union semun su;
+    su.val = 1;
+    int shm = shmget(SHM_KEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+    int sem = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
+    semctl(sem, 0, SETVAL, su);
+    int fd = open("story.txt", O_CREAT | O_RDWR | O_TRUNC | 0644);
+    close(fd);
+    return 0;
+  }
 
-	if(!strcmp(argv[1], "-r")){
-		int shm = shmget(SHM_KEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
-		shmctl(shm, 0, IPC_RMID);
-		int sem = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
-		semctl(sem, 0, IPC_RMID);
-		printstory();
-		return 0;
-	}
+  if(!strcmp(argv[1], "-r")){
+    int shm = shmget(SHM_KEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
+    shmctl(shm, 0, IPC_RMID);
+    int sem = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
+    semctl(sem, 0, IPC_RMID);
+    printstory();
+    return 0;
+  }
 
 
-	if(!strcmp(argv[1], "-v")){
-		int fd = open("story.txt", O_RDONLY);
+  if(!strcmp(argv[1], "-v")){
+    printstory();
+    return 0;
+  }
 
-		close(fd);
-		return 0;
-	}
+  else{
+    printf("error: expected -c, -r, or -v, given %s\n", argv[1]);
+  }
 
-	else{
-		printf("error: expected -c, -r, or -v, given %s\n", argv[1]);
-	}
-
-	return 0;
+  return 0;
 }
