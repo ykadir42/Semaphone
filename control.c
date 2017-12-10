@@ -20,6 +20,15 @@ union semun {
                                (Linux-specific) */
 };
 
+void printstory () {
+  int fd = open("story.txt", O_RDONLY);
+  int size = lseek(fd, 0, SEEK_END);
+  lseek(fd, 0, SEEK_SET);
+  char* buf = malloc(size + 1);
+  read(fd, buf, size);
+  printf("STORY \n%s\n", buf);
+}
+
 int main(int argc, char** argv){
 	if(argc != 2){
 		printf("error: unexpected number of arguments, expected 1\n");
@@ -39,7 +48,10 @@ int main(int argc, char** argv){
 
 	if(!strcmp(argv[1], "-r")){
 		int shm = shmget(SHM_KEY, sizeof(int), IPC_CREAT | IPC_EXCL | 0644);
-		shmctl(shm, IPC_RMID, NULL);
+		shmctl(shm, 0, IPC_RMID);
+		int sem = semget(SEM_KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
+		semctl(sem, 0, IPC_RMID);
+		printstory();
 		return 0;
 	}
 
@@ -55,5 +67,5 @@ int main(int argc, char** argv){
 		printf("error: expected -c, -r, or -v, given %s\n", argv[1]);
 	}
 
- return 0;
+	return 0;
 }
