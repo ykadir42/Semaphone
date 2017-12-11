@@ -8,6 +8,7 @@ void printstory () {
   read(fd, buf, size);
   printf("STORY \n%s\n", buf);
   close(fd);
+  free(buf);
 }
 
 int main(int argc, char** argv){
