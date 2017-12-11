@@ -26,3 +26,13 @@ void error(int val){
 		exit(EXIT_FAILURE);
 	}
 }
+
+void printstory (int offset) {
+  int fd = open("story.txt", O_RDONLY);
+  int size = lseek(fd, offset, SEEK_END) - offset;
+  lseek(fd, offset, SEEK_SET);
+  char* buf = calloc(1, size + 1);
+  read(fd, buf, size);
+  printf("%s\n", buf);
+  close(fd);
+}
