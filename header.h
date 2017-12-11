@@ -9,8 +9,8 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 
-#define SHM_KEY 13
-#define SEM_KEY 980081
+#define SHM_KEY 980081
+#define SEM_KEY 13
 
 union semun {
    int              val;    /* Value for SETVAL */
@@ -19,3 +19,10 @@ union semun {
    struct seminfo  *__buf;  /* Buffer for IPC_INFO
                                (Linux-specific) */
 };
+
+void error(int val){
+	if(val == -1){
+		printf("%s\n", strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+}
