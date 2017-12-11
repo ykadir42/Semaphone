@@ -25,6 +25,24 @@ int main(){
 	sb.sem_num = 0;
 	sb.sem_flg = SEM_UNDO;
 	semop(sem, &sb, 1);
+	printf("You're good to go\n");
 
-	printf("Last line: \n");
+	printlast();
+	printf("Write the next line:");
+	char line[100];
+	fgets(line, sizeof(line), stdin);
+
+	int fd = open("story.txt", O_APPEND);
+	write(fd, line, strlen(line));
+
+	int shmid = shmget(SHM_KEY, 0, 0);
+	int* temp = (int*) shmat(shmid, 0, 0);
+	*temp = strlen(line);
+	shmdt(temp);
+
+	sb.sem_op = 1;
+	semop(sem, &sb, 1);
+
+	return 0;
+	
 }
